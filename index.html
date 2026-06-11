@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>之栓 / 胶囊人情绪插画作品站</title>
+    <meta
+      name="description"
+      content="之栓的原创胶囊人 IP、绘本感场景插画与空间视觉想象作品展示。"
+    />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles.css?v=20260611-4" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="返回首页">
+        <span class="brand-mark">Z</span>
+        <span>
+          <strong>之栓</strong>
+          <small>胶囊人 / 情绪插画</small>
+        </span>
+      </a>
+      <nav class="top-nav" aria-label="页面导航">
+        <a href="#works">作品</a>
+        <a href="#series">玩法</a>
+        <a href="#contact">合作</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero reveal" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">之栓 / Original IP / Picture-book Scenes</p>
+          <h1 id="hero-title">你好，我是之栓。<br />这些是我的胶囊人。</h1>
+          <p class="hero-text">
+            我把一些说不清的情绪放进角色和场景里。这里不是正式展厅，更像一个可以停留的房间：
+            你可以看图、抽一张情绪，也可以告诉我你第一眼感受到了什么。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#works">浏览作品</a>
+            <button class="button ghost" id="randomWork" type="button">抽一张情绪</button>
+          </div>
+        </div>
+        <button class="hero-stage" id="heroStage" type="button" aria-label="打开精选作品">
+          <img id="heroImage" alt="胶囊人精选插画" />
+          <div class="hero-scanline" aria-hidden="true"></div>
+          <div class="hero-caption">
+            <span id="heroSeries">胶囊人 IP</span>
+            <strong id="heroTitle">情绪场景</strong>
+            <small id="heroMood">情绪重构中</small>
+          </div>
+          <div class="hero-dots" id="heroDots" aria-hidden="true"></div>
+        </button>
+      </section>
+
+      <section class="section intro reveal" id="series" aria-labelledby="series-title">
+        <div>
+          <p class="section-kicker">A Small Room</p>
+          <h2 id="series-title">欢迎你这样逛</h2>
+        </div>
+        <div class="series-grid" id="seriesGrid"></div>
+      </section>
+
+      <section class="section story-wall reveal" aria-labelledby="story-wall-title">
+        <div>
+          <p class="section-kicker">Talk To Me</p>
+          <h2 id="story-wall-title">我想听你说什么</h2>
+        </div>
+        <div class="archive-logic">
+          <article>
+            <span>01</span>
+            <h3>第一眼的情绪</h3>
+            <p>你不需要懂插画。只要告诉我：这张图让你觉得安静、孤独、梦幻，还是有点不安。</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>一句真实的话</h3>
+            <p>如果某张图让你停了一下，欢迎写一句话。哪怕只是“我喜欢这个角落”。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section toolbar-section" id="works" aria-labelledby="works-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Portfolio</p>
+            <h2 id="works-title">作品</h2>
+          </div>
+          <p class="section-note">
+            点击作品看完整大图；如果愿意，也可以给它投一个情绪票，或留一句话给我。
+          </p>
+        </div>
+
+        <div class="toolbar" aria-label="作品筛选工具">
+          <div class="filter-scroll" id="filters" role="tablist" aria-label="系列筛选"></div>
+          <label class="search-box">
+            <span>搜索</span>
+            <input id="searchInput" type="search" placeholder="输入作品名或系列" />
+          </label>
+        </div>
+
+        <div class="result-meta" id="resultMeta" aria-live="polite"></div>
+        <div class="gallery" id="gallery"></div>
+      </section>
+
+      <section class="section services reveal" id="contact" aria-labelledby="contact-title">
+        <div class="service-copy">
+          <p class="section-kicker">Work With Zhishuan</p>
+          <h2 id="contact-title">如果你想一起做点什么</h2>
+          <p>
+            我希望这些画不只停在屏幕里。它们可以变成一本小书、一面墙、一组空间视觉，
+            或者一个品牌和人对话的入口。如果你正好在做相关项目，可以来小红书找我聊聊。
+          </p>
+        </div>
+        <div class="service-list">
+          <article>
+            <span>01</span>
+            <h3>插画定制</h3>
+            <p>适合封面、活动视觉、主题海报、社交媒体画面。</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>原创 IP 延展</h3>
+            <p>胶囊人角色、贴纸、明信片、壁纸、文创视觉。</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>墙绘与空间视觉</h3>
+            <p>商业空间、社区空间、展览墙面、儿童友好场景。</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>绘本感项目</h3>
+            <p>绘本感世界观、故事视觉、品牌活动叙事画面。</p>
+          </article>
+        </div>
+        <div class="contact-strip">
+          <strong>之栓</strong>
+          <span>小红书：QQ1504720783</span>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal" id="workModal" aria-hidden="true">
+      <div class="modal-backdrop" data-close-modal></div>
+      <section
+        class="modal-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+      >
+        <button class="icon-button close-button" type="button" data-close-modal aria-label="关闭">
+          ×
+        </button>
+        <div class="modal-media">
+          <img id="modalImage" alt="" />
+        </div>
+        <div class="modal-copy">
+          <h2 id="modalTitle"></h2>
+          <div class="modal-actions">
+            <a class="button primary" id="openOriginal" target="_blank" rel="noreferrer">
+              打开高清图
+            </a>
+            <a class="button ghost" id="openPdf" target="_blank" rel="noreferrer">
+              原始 PDF
+            </a>
+          </div>
+          <section class="feedback-panel" aria-labelledby="feedbackTitle">
+            <div class="feedback-head">
+              <p class="section-kicker">Your Reaction</p>
+              <h3 id="feedbackTitle">你愿意和我说一句吗？</h3>
+            </div>
+            <div class="emotion-votes" id="emotionVotes" aria-label="情绪投票"></div>
+            <label class="feedback-field">
+              <span>留言</span>
+              <textarea
+                id="feedbackText"
+                rows="4"
+                placeholder="比如：这张图让我想到…… / 我最喜欢…… / 我有点看不懂但觉得……"
+              ></textarea>
+            </label>
+            <div class="feedback-actions">
+              <button class="button primary" id="saveFeedback" type="button">保存反馈</button>
+              <button class="button subtle" id="exportFeedback" type="button">导出反馈</button>
+            </div>
+            <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
+            <div class="feedback-list" id="feedbackList"></div>
+          </section>
+          <div class="modal-nav">
+            <button class="button subtle" id="prevWork" type="button">上一张</button>
+            <button class="button subtle" id="nextWork" type="button">下一张</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="data/works-data.js"></script>
+    <script src="app.js?v=20260611-4"></script>
+  </body>
+</html>
