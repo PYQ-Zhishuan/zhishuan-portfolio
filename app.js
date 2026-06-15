@@ -31,6 +31,115 @@ const EMOTION_POOL = [
   "像夜晚",
   "想变成明信片",
   "很之栓",
+  "像一场梦",
+  "轻微失重",
+  "潮湿的蓝色",
+  "像小房间",
+  "有一点亮",
+  "像走进雾里",
+  "心里软了一下",
+  "像夏天傍晚",
+  "像下课路上",
+  "有点离谱但喜欢",
+  "想摸摸它",
+  "像旧照片",
+  "有点倔强",
+  "很适合贴纸",
+  "像一页绘本",
+  "想知道后续",
+  "像没人说出口的话",
+  "有一点冷",
+  "有一点热闹",
+  "像躲起来",
+  "像被看见",
+  "像在漂流",
+  "适合挂在墙上",
+  "想做成书签",
+  "有电影感",
+  "像梦醒之前",
+  "有点幼稚但可爱",
+  "像一个入口",
+  "情绪很满",
+  "很轻",
+  "很慢",
+  "很安稳",
+  "像风吹过",
+  "有点发光",
+  "像一个拥抱",
+  "像独处",
+  "像在等人",
+  "像迷路",
+  "像突然开心",
+  "像一颗糖",
+  "像雨后",
+  "有点透明",
+  "像另一个世界",
+  "适合做海报",
+  "适合做封面",
+  "适合做明信片",
+  "像儿童剧场",
+  "有空间感",
+  "想走进去看看",
+  "像一段旋律",
+  "颜色很舒服",
+  "角色很有记忆点",
+  "画面很会呼吸",
+  "像一个小岛",
+  "像夜里的灯",
+  "像午睡醒来",
+  "像某种告别",
+  "像重新开始",
+  "有点笨拙",
+  "有点勇敢",
+  "有点脆弱",
+  "有点浪漫",
+  "有点顽皮",
+  "很适合空间视觉",
+  "想看它动起来",
+  "像一张梦境地图",
+  "像童话背面",
+  "像心情天气",
+  "像一封没寄出的信",
+  "像海底散步",
+  "像云里迷路",
+  "像被轻轻接住",
+  "像小声说话",
+  "像秘密基地",
+  "像逃跑计划",
+  "像慢慢靠近",
+  "像柔软的怪念头",
+  "像孤单但不难过",
+  "像一个奇怪朋友",
+  "像窗边发呆",
+  "像今天的心情",
+  "像梦里见过",
+  "想发给朋友",
+  "想放在房间里",
+  "想做成周边",
+  "想看系列故事",
+  "适合做展览墙",
+  "适合做公共艺术",
+  "适合儿童空间",
+  "有一点神秘",
+  "有一点荒凉",
+  "有一点甜",
+  "有一点怪",
+  "有一点轻松",
+  "有一点想哭",
+  "很像情绪标本",
+  "很像记忆碎片",
+  "很像梦的封面",
+  "很像心里的角落",
+  "很像路过的风景",
+  "很像另一个自己",
+  "看完会停一下",
+  "越看越喜欢",
+  "第一眼记住了",
+  "想知道名字",
+  "像在讲悄悄话",
+  "像一场小冒险",
+  "像未来的绘本",
+  "像一面墙的开始",
 ];
 
 const EMOTION_COLORS = [
@@ -42,6 +151,14 @@ const EMOTION_COLORS = [
   "#9bd36a",
   "#ff9ed2",
   "#8ec8ff",
+  "#ffa6a6",
+  "#c6f67d",
+  "#f7b7ff",
+  "#80d8ff",
+  "#ffcf8a",
+  "#a6e3a1",
+  "#f5a3c7",
+  "#d7c4ff",
 ];
 
 const imagePreloadCache = new Map();
@@ -141,12 +258,20 @@ function getEmotionSet(work) {
   const available = [...EMOTION_POOL];
   let seed = hashString(work.id || work.title);
   const picked = [];
-  while (picked.length < 9 && available.length) {
+  while (picked.length < 15 && available.length) {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     const index = seed % available.length;
     picked.push(available.splice(index, 1)[0]);
   }
   return picked;
+}
+
+function chunkItems(items, size) {
+  const chunks = [];
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
 }
 
 function preloadWorkImage(work) {
@@ -312,33 +437,37 @@ function renderEmotionVotes(work) {
   const feedback = getWorkFeedback(work.id);
   const votes = feedback.votes || {};
   const emotions = getEmotionSet(work);
-  const repeated = [...emotions, ...emotions];
   els.emotionVotes.innerHTML = `
-    <div class="emotion-track">
-      ${repeated
-        .map((emotion, index) => {
-          const color = EMOTION_COLORS[index % EMOTION_COLORS.length];
-          return `
-            <button
-              class="emotion-button"
-              type="button"
-              data-emotion="${escapeHtml(emotion)}"
-              style="--emotion-color: ${color}"
-            >
-              <span>${escapeHtml(emotion)}</span>
-              <strong>${votes[emotion] || 0}</strong>
-            </button>
-          `;
-        })
-        .join("")}
-    </div>
+    ${chunkItems(emotions, 5)
+      .map((row, rowIndex) => {
+        const repeated = [...row, ...row];
+        return `
+          <div class="emotion-row ${rowIndex === 1 ? "reverse" : ""}" style="--row-speed: ${30 + rowIndex * 7}s">
+            <div class="emotion-track">
+              ${repeated
+                .map((emotion, index) => {
+                  const color = EMOTION_COLORS[(rowIndex * 5 + index) % EMOTION_COLORS.length];
+                  return `
+                    <button
+                      class="emotion-button"
+                      type="button"
+                      data-emotion="${escapeHtml(emotion)}"
+                      style="--emotion-color: ${color}"
+                    >
+                      <span>${escapeHtml(emotion)}</span>
+                      <strong>${votes[emotion] || 0}</strong>
+                    </button>
+                  `;
+                })
+                .join("")}
+            </div>
+          </div>
+        `;
+      })
+      .join("")}
   `;
 
-  els.emotionVotes.querySelectorAll("[data-emotion]").forEach((button) => {
-    button.addEventListener("click", () => {
-      voteEmotion(work, button.dataset.emotion);
-    });
-  });
+  els.emotionVotes.dataset.workId = work.id;
 }
 
 function renderFeedback(work) {
@@ -558,6 +687,12 @@ function bindEvents() {
   els.randomWork.addEventListener("click", randomOpenWork);
   els.saveFeedback.addEventListener("click", saveTextFeedback);
   els.exportFeedback.addEventListener("click", exportAllFeedback);
+  els.emotionVotes.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-emotion]");
+    const work = getActiveWork();
+    if (!button || !work || work.id !== els.emotionVotes.dataset.workId) return;
+    voteEmotion(work, button.dataset.emotion);
+  });
 
   document.querySelectorAll("[data-close-modal]").forEach((el) => {
     el.addEventListener("click", closeModal);
