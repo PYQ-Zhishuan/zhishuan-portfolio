@@ -2,7 +2,49 @@ const sourceData = window.PORTFOLIO_DATA || { series: [], works: [] };
 const data = sourceData;
 
 const FEEDBACK_KEY = "capsule-portfolio-feedback-v2";
-const EMOTIONS = ["被打动", "治愈", "孤独", "梦幻", "不安", "想收藏"];
+const EMOTION_POOL = [
+  "像做梦",
+  "被安慰",
+  "有点孤独",
+  "很自由",
+  "想收藏",
+  "有故事",
+  "怪可爱的",
+  "安静",
+  "轻飘飘",
+  "像童年",
+  "想住进去",
+  "有点痛",
+  "很温柔",
+  "不太懂但喜欢",
+  "有画面感",
+  "像一首歌",
+  "有点荒诞",
+  "想继续看",
+  "适合做墙绘",
+  "适合做绘本",
+  "像秘密",
+  "有风",
+  "很柔软",
+  "像旅行",
+  "有点不安",
+  "像夜晚",
+  "想变成明信片",
+  "很之栓",
+];
+
+const EMOTION_COLORS = [
+  "#e8ff44",
+  "#7ee7d8",
+  "#ff8a6b",
+  "#b9a7ff",
+  "#ffd66b",
+  "#9bd36a",
+  "#ff9ed2",
+  "#8ec8ff",
+];
+
+const imagePreloadCache = new Map();
 
 const state = {
   filter: "all",
@@ -87,6 +129,32 @@ function setFeedbackStatus(text) {
 
 function getActiveWork() {
   return state.visibleWorks[state.activeIndex];
+}
+
+function hashString(value) {
+  return String(value || "").split("").reduce((hash, char) => {
+    return (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }, 2166136261);
+}
+
+function getEmotionSet(work) {
+  const available = [...EMOTION_POOL];
+  let seed = hashString(work.id || work.title);
+  const picked = [];
+  while (picked.length < 9 && available.length) {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    const index = seed % available.length;
+    picked.push(available.splice(index, 1)[0]);
+  }
+  return picked;
+}
+
+function preloadWorkImage(work) {
+  if (!work || !work.image || imagePreloadCache.has(work.image)) return;
+  const image = new Image();
+  image.decoding = "async";
+  image.src = work.image;
+  imagePreloadCache.set(work.image, image);
 }
 
 function renderHero() {
@@ -232,7 +300,10 @@ function renderGallery() {
     .join("");
 
   els.gallery.querySelectorAll("[data-index]").forEach((card) => {
-    card.addEventListener("click", () => openModal(Number(card.dataset.index)));
+    const index = Number(card.dataset.index);
+    card.addEventListener("mouseenter", () => preloadWorkImage(state.visibleWorks[index]));
+    card.addEventListener("focus", () => preloadWorkImage(state.visibleWorks[index]));
+    card.addEventListener("click", () => openModal(index));
   });
   window.requestAnimationFrame(() => els.gallery.classList.add("is-ready"));
 }
@@ -240,14 +311,28 @@ function renderGallery() {
 function renderEmotionVotes(work) {
   const feedback = getWorkFeedback(work.id);
   const votes = feedback.votes || {};
-  els.emotionVotes.innerHTML = EMOTIONS.map(
-    (emotion) => `
-      <button class="emotion-button" type="button" data-emotion="${escapeHtml(emotion)}">
-        <span>${escapeHtml(emotion)}</span>
-        <strong>${votes[emotion] || 0}</strong>
-      </button>
-    `
-  ).join("");
+  const emotions = getEmotionSet(work);
+  const repeated = [...emotions, ...emotions];
+  els.emotionVotes.innerHTML = `
+    <div class="emotion-track">
+      ${repeated
+        .map((emotion, index) => {
+          const color = EMOTION_COLORS[index % EMOTION_COLORS.length];
+          return `
+            <button
+              class="emotion-button"
+              type="button"
+              data-emotion="${escapeHtml(emotion)}"
+              style="--emotion-color: ${color}"
+            >
+              <span>${escapeHtml(emotion)}</span>
+              <strong>${votes[emotion] || 0}</strong>
+            </button>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
 
   els.emotionVotes.querySelectorAll("[data-emotion]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -352,12 +437,35 @@ function openModal(index) {
   const work = state.visibleWorks[index];
   if (!work) return;
   state.activeIndex = index;
-  els.modalImage.src = work.image;
+  els.modalImage.classList.add("is-loading");
+  els.modalImage.src = work.thumb || work.image;
   els.modalImage.alt = work.title;
   els.modalTitle.textContent = work.title;
   els.feedbackText.value = "";
   setFeedbackStatus("");
   renderFeedback(work);
+
+  if (work.image) {
+    const image = imagePreloadCache.get(work.image) || new Image();
+    image.decoding = "async";
+    image.onload = () => {
+      const activeWork = getActiveWork();
+      if (activeWork && activeWork.id === work.id) {
+        els.modalImage.src = work.image;
+        els.modalImage.classList.remove("is-loading");
+      }
+    };
+    image.onerror = () => {
+      els.modalImage.classList.remove("is-loading");
+    };
+    if (!imagePreloadCache.has(work.image)) {
+      imagePreloadCache.set(work.image, image);
+      image.src = work.image;
+    } else if (image.complete && image.naturalWidth > 0) {
+      els.modalImage.src = work.image;
+      els.modalImage.classList.remove("is-loading");
+    }
+  }
 
   if (work.original || work.image) {
     els.openOriginal.href = work.original || work.image;
