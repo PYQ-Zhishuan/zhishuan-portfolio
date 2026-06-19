@@ -390,6 +390,10 @@ function setModalMediaTone(color) {
   els.modalMedia.style.setProperty("--media-bg-glow", colorToRgb(glow));
   els.modalMedia.style.setProperty("--media-bg-deep", colorToRgb(deep));
   els.modalMedia.style.setProperty("--media-film", colorToRgb(film));
+  els.modalMedia.style.setProperty("--media-bg-rgb", `${soft.r}, ${soft.g}, ${soft.b}`);
+  els.modalMedia.style.setProperty("--media-glow-rgb", `${glow.r}, ${glow.g}, ${glow.b}`);
+  els.modalMedia.style.setProperty("--media-deep-rgb", `${deep.r}, ${deep.g}, ${deep.b}`);
+  els.modalMedia.style.setProperty("--media-film-rgb", `${film.r}, ${film.g}, ${film.b}`);
 }
 
 function setModalMediaImage(src) {

@@ -676,17 +676,23 @@ img {
   --media-bg-glow: #f7f9ee;
   --media-bg-deep: #d9dfd2;
   --media-film: #eef6ec;
+  --media-bg-rgb: 229, 235, 225;
+  --media-glow-rgb: 247, 249, 238;
+  --media-deep-rgb: 217, 223, 210;
+  --media-film-rgb: 238, 246, 236;
   position: relative;
   display: grid;
   min-height: 0;
   place-items: center;
   padding: 0;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--media-bg-glow) 84%, transparent), color-mix(in srgb, var(--media-bg-deep) 76%, transparent)),
+    linear-gradient(135deg, rgba(var(--media-glow-rgb), 0.88), rgba(var(--media-deep-rgb), 0.82)),
     var(--media-bg);
   overflow: hidden;
   transition: background 0.35s ease;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.42),
+    inset 0 0 72px rgba(var(--media-film-rgb), 0.45);
 }
 
 .modal-media::before {
@@ -696,8 +702,8 @@ img {
   background-position: center;
   background-size: cover;
   content: "";
-  filter: blur(26px) saturate(1.28) brightness(1.08);
-  opacity: 0.32;
+  filter: blur(30px) saturate(1.42) brightness(1.12);
+  opacity: 0.44;
   pointer-events: none;
   transform: scale(1.04);
   animation: mediaMist 18s ease-in-out infinite alternate;
@@ -707,36 +713,38 @@ img {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(118deg, transparent 0 12%, color-mix(in srgb, var(--media-film) 42%, transparent) 13% 34%, transparent 35% 100%),
-    linear-gradient(64deg, transparent 0 54%, color-mix(in srgb, var(--media-bg-glow) 46%, transparent) 55% 78%, transparent 79% 100%),
-    radial-gradient(circle at 28% 18%, color-mix(in srgb, white 62%, transparent) 0 18%, transparent 42%),
-    radial-gradient(circle at 70% 62%, color-mix(in srgb, var(--media-bg-deep) 62%, transparent) 0 26%, transparent 58%),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.2), transparent 26%, transparent 74%, rgba(255, 255, 255, 0.12)),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 42%, rgba(255, 255, 255, 0.04));
+    linear-gradient(118deg, transparent 0 10%, rgba(var(--media-film-rgb), 0.62) 12% 35%, transparent 38% 100%),
+    linear-gradient(64deg, transparent 0 50%, rgba(var(--media-glow-rgb), 0.72) 54% 80%, transparent 83% 100%),
+    radial-gradient(circle at 26% 17%, rgba(255, 255, 255, 0.72) 0 18%, transparent 44%),
+    radial-gradient(circle at 70% 62%, rgba(var(--media-deep-rgb), 0.72) 0 27%, transparent 60%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.24), transparent 27%, transparent 73%, rgba(255, 255, 255, 0.14)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 38%, rgba(var(--media-bg-rgb), 0.2));
   content: "";
-  opacity: 0.92;
+  opacity: 0.96;
   pointer-events: none;
   backdrop-filter: saturate(1.28) brightness(1.04);
   animation: colorFilmDrift 14s ease-in-out infinite alternate;
 }
 
 .modal-media img {
-  position: absolute;
-  inset: var(--media-inset);
-  z-index: 2;
+  position: relative;
+  z-index: 3;
   display: block;
-  width: calc(100% - var(--media-gap));
-  height: calc(100% - var(--media-gap));
-  max-width: none;
-  max-height: none;
+  width: auto;
+  height: auto;
+  max-width: calc(100% - var(--media-gap));
+  max-height: calc(100% - var(--media-gap));
   object-fit: contain;
   object-position: center center;
   filter:
-    drop-shadow(0 26px 42px rgba(25, 30, 28, 0.28))
-    drop-shadow(0 5px 12px rgba(25, 30, 28, 0.16))
-    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.32));
-  transition: opacity 0.22s ease, filter 0.22s ease, transform 0.35s ease;
-  animation: modalImageFloat 8s ease-in-out infinite alternate;
+    drop-shadow(0 34px 52px rgba(23, 27, 25, 0.36))
+    drop-shadow(0 10px 18px rgba(23, 27, 25, 0.22))
+    drop-shadow(0 -2px 0 rgba(255, 255, 255, 0.42));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.42),
+    0 0 34px rgba(var(--media-glow-rgb), 0.58);
+  transition: opacity 0.22s ease, filter 0.22s ease, transform 0.35s ease, box-shadow 0.35s ease;
+  animation: modalImageFloat 6s ease-in-out infinite alternate;
 }
 
 .modal-media img.is-loading {
@@ -1015,23 +1023,23 @@ img {
 
 @keyframes mediaMist {
   0% {
-    opacity: 0.26;
-    transform: scale(1.04) translate3d(-10px, -6px, 0);
+    opacity: 0.34;
+    transform: scale(1.05) translate3d(-18px, -10px, 0);
   }
   100% {
-    opacity: 0.38;
-    transform: scale(1.1) translate3d(12px, 8px, 0);
+    opacity: 0.48;
+    transform: scale(1.14) translate3d(18px, 12px, 0);
   }
 }
 
 @keyframes colorFilmDrift {
   0% {
     background-position: 0% 0%, 100% 0%, 24% 12%, 72% 62%, 0% 0%, 0% 0%;
-    transform: translate3d(-8px, -4px, 0) scale(1.02);
+    transform: translate3d(-14px, -7px, 0) scale(1.03);
   }
   100% {
     background-position: 18% 8%, 82% 12%, 30% 18%, 66% 56%, 0% 0%, 0% 0%;
-    transform: translate3d(8px, 5px, 0) scale(1.05);
+    transform: translate3d(14px, 8px, 0) scale(1.07);
   }
 }
 
@@ -1040,7 +1048,7 @@ img {
     transform: translate3d(0, 0, 0) scale(1);
   }
   100% {
-    transform: translate3d(0, -5px, 0) scale(1.006);
+    transform: translate3d(0, -8px, 0) scale(1.01);
   }
 }
 
