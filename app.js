@@ -470,8 +470,12 @@ function renderEmotionVotes(work) {
   els.emotionVotes.dataset.workId = work.id;
 }
 
-function renderFeedback(work) {
-  renderEmotionVotes(work);
+function renderFeedback(work, options = {}) {
+  const { renderVotes = true } = options;
+  if (renderVotes) {
+    renderEmotionVotes(work);
+  }
+
   const feedback = getWorkFeedback(work.id);
   const notes = feedback.notes || [];
   if (!notes.length) {
@@ -495,17 +499,34 @@ function renderFeedback(work) {
     .join("");
 }
 
+function updateEmotionVoteCount(emotion, count) {
+  els.emotionVotes.querySelectorAll("[data-emotion]").forEach((button) => {
+    if (button.dataset.emotion !== emotion) return;
+
+    const counter = button.querySelector("strong");
+    if (counter) {
+      counter.textContent = count;
+    }
+    button.classList.add("just-voted");
+    window.setTimeout(() => button.classList.remove("just-voted"), 450);
+  });
+}
+
 function voteEmotion(work, emotion) {
   try {
-    updateWorkFeedback(work.id, (feedback) => ({
-      votes: {
-        ...(feedback.votes || {}),
-        [emotion]: ((feedback.votes || {})[emotion] || 0) + 1,
-      },
-      notes: feedback.notes || [],
-      title: work.title,
-    }));
-    renderFeedback(work);
+    let nextCount = 0;
+    updateWorkFeedback(work.id, (feedback) => {
+      nextCount = ((feedback.votes || {})[emotion] || 0) + 1;
+      return {
+        votes: {
+          ...(feedback.votes || {}),
+          [emotion]: nextCount,
+        },
+        notes: feedback.notes || [],
+        title: work.title,
+      };
+    });
+    updateEmotionVoteCount(emotion, nextCount);
     setFeedbackStatus(`已记录：${emotion}`);
   } catch {
     setFeedbackStatus("当前浏览器不允许保存反馈。");
@@ -534,7 +555,7 @@ function saveTextFeedback() {
       title: work.title,
     }));
     els.feedbackText.value = "";
-    renderFeedback(work);
+    renderFeedback(work, { renderVotes: false });
     setFeedbackStatus("谢谢你，我已经在当前浏览器里记下来了。");
   } catch {
     setFeedbackStatus("当前浏览器不允许保存反馈。");

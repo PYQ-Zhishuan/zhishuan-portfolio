@@ -827,6 +827,11 @@ img {
   filter: saturate(1.08);
 }
 
+.emotion-button.just-voted {
+  transform: translateY(-1px) scale(1.04);
+  filter: saturate(1.14);
+}
+
 .emotion-button strong {
   display: grid;
   min-width: 22px;
