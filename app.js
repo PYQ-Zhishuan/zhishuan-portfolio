@@ -186,6 +186,7 @@ const els = {
   resultMeta: document.getElementById("resultMeta"),
   gallery: document.getElementById("gallery"),
   modal: document.getElementById("workModal"),
+  modalMedia: document.querySelector(".modal-media"),
   modalImage: document.getElementById("modalImage"),
   modalTitle: document.getElementById("modalTitle"),
   openOriginal: document.getElementById("openOriginal"),
@@ -280,6 +281,124 @@ function preloadWorkImage(work) {
   image.decoding = "async";
   image.src = work.image;
   imagePreloadCache.set(work.image, image);
+}
+
+function rgbToHsl(r, g, b) {
+  const red = r / 255;
+  const green = g / 255;
+  const blue = b / 255;
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  let hue = 0;
+  let saturation = 0;
+  const lightness = (max + min) / 2;
+
+  if (max !== min) {
+    const delta = max - min;
+    saturation = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+    switch (max) {
+      case red:
+        hue = (green - blue) / delta + (green < blue ? 6 : 0);
+        break;
+      case green:
+        hue = (blue - red) / delta + 2;
+        break;
+      default:
+        hue = (red - green) / delta + 4;
+        break;
+    }
+    hue *= 60;
+  }
+
+  return { hue, saturation, lightness };
+}
+
+function mixColor(color, target, amount) {
+  return {
+    r: Math.round(color.r * (1 - amount) + target.r * amount),
+    g: Math.round(color.g * (1 - amount) + target.g * amount),
+    b: Math.round(color.b * (1 - amount) + target.b * amount),
+  };
+}
+
+function colorToRgb(color) {
+  return `rgb(${color.r}, ${color.g}, ${color.b})`;
+}
+
+function getImageMoodColor(image) {
+  const canvas = document.createElement("canvas");
+  const size = 56;
+  canvas.width = size;
+  canvas.height = size;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context || !image.naturalWidth || !image.naturalHeight) return null;
+
+  context.drawImage(image, 0, 0, size, size);
+  const pixels = context.getImageData(0, 0, size, size).data;
+  const buckets = new Map();
+  let fallback = { r: 0, g: 0, b: 0, weight: 0 };
+
+  for (let index = 0; index < pixels.length; index += 16) {
+    const alpha = pixels[index + 3];
+    if (alpha < 180) continue;
+
+    const r = pixels[index];
+    const g = pixels[index + 1];
+    const b = pixels[index + 2];
+    const { hue, saturation, lightness } = rgbToHsl(r, g, b);
+    if (lightness < 0.1 || lightness > 0.95) continue;
+
+    const fallbackWeight = 1 - Math.abs(lightness - 0.58);
+    fallback.r += r * fallbackWeight;
+    fallback.g += g * fallbackWeight;
+    fallback.b += b * fallbackWeight;
+    fallback.weight += fallbackWeight;
+
+    if (saturation < 0.08 || lightness < 0.16 || lightness > 0.9) continue;
+
+    const hueBucket = Math.round(hue / 18) * 18;
+    const key = String(hueBucket);
+    const weight = (0.45 + saturation) * (1.15 - Math.abs(lightness - 0.6));
+    const bucket = buckets.get(key) || { r: 0, g: 0, b: 0, weight: 0 };
+    bucket.r += r * weight;
+    bucket.g += g * weight;
+    bucket.b += b * weight;
+    bucket.weight += weight;
+    buckets.set(key, bucket);
+  }
+
+  const best = [...buckets.values()].sort((a, b) => b.weight - a.weight)[0];
+  const source = best && best.weight > 0 ? best : fallback;
+  if (!source || source.weight <= 0) return null;
+
+  return {
+    r: Math.round(source.r / source.weight),
+    g: Math.round(source.g / source.weight),
+    b: Math.round(source.b / source.weight),
+  };
+}
+
+function setModalMediaTone(color) {
+  if (!els.modalMedia) return;
+  const base = color || { r: 205, g: 216, b: 208 };
+  const soft = mixColor(base, { r: 255, g: 252, b: 241 }, 0.46);
+  const glow = mixColor(base, { r: 255, g: 255, b: 255 }, 0.68);
+  const deep = mixColor(base, { r: 22, g: 25, b: 24 }, 0.28);
+
+  els.modalMedia.style.setProperty("--media-bg", colorToRgb(soft));
+  els.modalMedia.style.setProperty("--media-bg-glow", colorToRgb(glow));
+  els.modalMedia.style.setProperty("--media-bg-deep", colorToRgb(deep));
+}
+
+function applyModalMediaTone(image, workId) {
+  const activeWork = getActiveWork();
+  if (!activeWork || activeWork.id !== workId) return;
+
+  try {
+    setModalMediaTone(getImageMoodColor(image));
+  } catch {
+    setModalMediaTone(null);
+  }
 }
 
 function renderHero() {
@@ -587,6 +706,7 @@ function openModal(index) {
   const work = state.visibleWorks[index];
   if (!work) return;
   state.activeIndex = index;
+  setModalMediaTone(null);
   els.modalImage.classList.add("is-loading");
   els.modalImage.src = work.thumb || work.image;
   els.modalImage.alt = work.title;
@@ -601,6 +721,7 @@ function openModal(index) {
     image.onload = () => {
       const activeWork = getActiveWork();
       if (activeWork && activeWork.id === work.id) {
+        applyModalMediaTone(image, work.id);
         els.modalImage.src = work.image;
         els.modalImage.classList.remove("is-loading");
       }
@@ -612,6 +733,7 @@ function openModal(index) {
       imagePreloadCache.set(work.image, image);
       image.src = work.image;
     } else if (image.complete && image.naturalWidth > 0) {
+      applyModalMediaTone(image, work.id);
       els.modalImage.src = work.image;
       els.modalImage.classList.remove("is-loading");
     }
