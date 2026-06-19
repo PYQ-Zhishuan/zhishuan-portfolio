@@ -381,13 +381,18 @@ function getImageMoodColor(image) {
 function setModalMediaTone(color) {
   if (!els.modalMedia) return;
   const base = color || { r: 205, g: 216, b: 208 };
-  const soft = mixColor(base, { r: 255, g: 252, b: 241 }, 0.46);
-  const glow = mixColor(base, { r: 255, g: 255, b: 255 }, 0.68);
-  const deep = mixColor(base, { r: 22, g: 25, b: 24 }, 0.28);
+  const soft = mixColor(base, { r: 255, g: 252, b: 241 }, 0.5);
+  const glow = mixColor(base, { r: 255, g: 255, b: 255 }, 0.74);
+  const deep = mixColor(base, { r: 255, g: 250, b: 235 }, 0.26);
 
   els.modalMedia.style.setProperty("--media-bg", colorToRgb(soft));
   els.modalMedia.style.setProperty("--media-bg-glow", colorToRgb(glow));
   els.modalMedia.style.setProperty("--media-bg-deep", colorToRgb(deep));
+}
+
+function setModalMediaImage(src) {
+  if (!els.modalMedia || !src) return;
+  els.modalMedia.style.setProperty("--media-image", `url("${src.replaceAll('"', "%22")}")`);
 }
 
 function applyModalMediaTone(image, workId) {
@@ -707,6 +712,7 @@ function openModal(index) {
   if (!work) return;
   state.activeIndex = index;
   setModalMediaTone(null);
+  setModalMediaImage(work.thumb || work.image);
   els.modalImage.classList.add("is-loading");
   els.modalImage.src = work.thumb || work.image;
   els.modalImage.alt = work.title;
@@ -722,6 +728,7 @@ function openModal(index) {
       const activeWork = getActiveWork();
       if (activeWork && activeWork.id === work.id) {
         applyModalMediaTone(image, work.id);
+        setModalMediaImage(work.image);
         els.modalImage.src = work.image;
         els.modalImage.classList.remove("is-loading");
       }
@@ -734,6 +741,7 @@ function openModal(index) {
       image.src = work.image;
     } else if (image.complete && image.naturalWidth > 0) {
       applyModalMediaTone(image, work.id);
+      setModalMediaImage(work.image);
       els.modalImage.src = work.image;
       els.modalImage.classList.remove("is-loading");
     }
