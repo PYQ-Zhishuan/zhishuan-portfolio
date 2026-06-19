@@ -381,13 +381,15 @@ function getImageMoodColor(image) {
 function setModalMediaTone(color) {
   if (!els.modalMedia) return;
   const base = color || { r: 205, g: 216, b: 208 };
-  const soft = mixColor(base, { r: 255, g: 252, b: 241 }, 0.5);
-  const glow = mixColor(base, { r: 255, g: 255, b: 255 }, 0.74);
-  const deep = mixColor(base, { r: 255, g: 250, b: 235 }, 0.26);
+  const soft = mixColor(base, { r: 255, g: 252, b: 241 }, 0.32);
+  const glow = mixColor(base, { r: 255, g: 255, b: 255 }, 0.62);
+  const deep = mixColor(base, { r: 248, g: 236, b: 255 }, 0.18);
+  const film = mixColor(base, { r: 255, g: 255, b: 255 }, 0.48);
 
   els.modalMedia.style.setProperty("--media-bg", colorToRgb(soft));
   els.modalMedia.style.setProperty("--media-bg-glow", colorToRgb(glow));
   els.modalMedia.style.setProperty("--media-bg-deep", colorToRgb(deep));
+  els.modalMedia.style.setProperty("--media-film", colorToRgb(film));
 }
 
 function setModalMediaImage(src) {
