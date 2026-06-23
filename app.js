@@ -275,12 +275,20 @@ function chunkItems(items, size) {
   return chunks;
 }
 
+function getPreviewSrc(work) {
+  if (!work) return "";
+  if (work.preview) return work.preview;
+  if (work.image) return work.image.replace("/works/", "/previews/");
+  return work.thumb || "";
+}
+
 function preloadWorkImage(work) {
-  if (!work || !work.image || imagePreloadCache.has(work.image)) return;
+  const src = getPreviewSrc(work);
+  if (!src || imagePreloadCache.has(src)) return;
   const image = new Image();
   image.decoding = "async";
-  image.src = work.image;
-  imagePreloadCache.set(work.image, image);
+  image.src = src;
+  imagePreloadCache.set(src, image);
 }
 
 function rgbToHsl(r, g, b) {
@@ -418,7 +426,7 @@ function renderHero() {
 
   els.heroImage.classList.remove("is-swapping");
   window.requestAnimationFrame(() => els.heroImage.classList.add("is-swapping"));
-  els.heroImage.src = work.image;
+  els.heroImage.src = getPreviewSrc(work);
   els.heroImage.alt = work.title;
   els.heroSeries.textContent = work.seriesName;
   els.heroTitle.textContent = work.title;
@@ -543,7 +551,13 @@ function renderGallery() {
           style="--card-delay: ${Math.min(index * 26, 360)}ms"
         >
           <span class="work-media">
-            <img src="${escapeHtml(work.thumb)}" alt="${escapeHtml(work.title)}" loading="lazy" />
+            <img
+              src="${escapeHtml(work.thumb)}"
+              alt="${escapeHtml(work.title)}"
+              loading="${index < 6 ? "eager" : "lazy"}"
+              decoding="async"
+              fetchpriority="${index < 6 ? "high" : "auto"}"
+            />
             <span class="work-overlay">查看作品</span>
           </span>
           <span class="work-info">
@@ -716,11 +730,12 @@ function exportAllFeedback() {
 function openModal(index) {
   const work = state.visibleWorks[index];
   if (!work) return;
+  const previewSrc = getPreviewSrc(work);
   state.activeIndex = index;
   setModalMediaTone(null);
-  setModalMediaImage(work.thumb || work.image);
+  setModalMediaImage(previewSrc || work.thumb || work.image);
   els.modalImage.classList.add("is-loading");
-  els.modalImage.src = work.thumb || work.image;
+  els.modalImage.src = previewSrc || work.thumb || work.image;
   els.modalImage.alt = work.title;
   els.modalTitle.textContent = work.title;
   els.feedbackText.value = "";

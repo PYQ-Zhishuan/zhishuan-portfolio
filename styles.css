@@ -760,11 +760,7 @@ img {
 }
 
 .modal-media img.is-loading {
-  opacity: 0.72;
-  filter:
-    blur(5px)
-    saturate(0.86)
-    drop-shadow(0 22px 38px rgba(25, 30, 28, 0.22));
+  opacity: 1;
 }
 
 .modal-copy {
